@@ -79,8 +79,6 @@
     <script>
         Echo.private('task')
             .listen('.task.created', (e) => {
-                console.log('yess');
-                console.log(e.task);
                 let description = e.task.description;
                 let task_created_date = e.task.created_at;
                 let created_date = task_created_date.split("T");

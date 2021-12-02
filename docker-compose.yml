@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  test_db:
+    image: 'bitnami/mariadb:10.2.32'
+    ports:
+      - "3306"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=my_user
+      - MARIADB_DATABASE=my_db
+      - MARIADB_PASSWORD=my_pass
+    volumes:
+      - ./docker/db-data:/bitnami/mariadb
+    networks:
+      - test_network
+
+  test_app:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    environment:
+      - DB_HOST=test_db
+      - DB_USERNAME=my_user
+      - DB_DATABASE=my_db
+      - DB_PASSWORD=my_pass
+      - LOG_CHANNEL=single
+      - PHP_MODULES_DISABLE=opcache
+    depends_on:
+      - test_db
+    privileged: true
+    ports:
+      - 80:3000
+    volumes:
+      - ./:/app
+    networks:
+      - test_network
+
+  redis:
+    image: 'redis'
+    ports:
+      - 6379:6379
+    networks:
+      - test_network
+
+networks:
+  test_network:
+    driver: bridge
